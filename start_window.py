@@ -5,7 +5,7 @@ import pygame
 
 pygame.init()
 pygame.display.set_caption('Star Fighter')
-size = width, height = 600, 600
+size = width, height = 650, 675
 screen = pygame.display.set_mode(size)
 
 
@@ -23,10 +23,12 @@ def load_image(name, colorkey=None):
 
 
 all_sprites = pygame.sprite.Group()
-sprite = pygame.sprite.Sprite()
-sprite.image = load_image("name_game.png")
-sprite.rect = sprite.image.get_rect()
-all_sprites.add(sprite)
+name = pygame.sprite.Sprite()
+name.image = load_image("name_game.png")
+name.rect = name.image.get_rect()
+all_sprites.add(name)
+name.rect.x = 20
+name.rect.y = 0
 start_image = load_image("start.png")
 start = pygame.sprite.Sprite(all_sprites)
 start.image = start_image
@@ -45,6 +47,12 @@ exit.image = exit_image
 exit.rect = exit.image.get_rect()
 exit.rect.x = 50
 exit.rect.y = 260
+copyrights_image = load_image("copyrights.png")
+copyrights = pygame.sprite.Sprite(all_sprites)
+copyrights.image = copyrights_image
+copyrights.rect = copyrights.image.get_rect()
+copyrights.rect.x = 30
+copyrights.rect.y = 500
 
 running = True
 i = 0
