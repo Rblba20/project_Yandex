@@ -80,6 +80,8 @@ while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                pass
             all_sprites.draw(screen)
             all_sprites.update(event)
             pygame.display.flip()
