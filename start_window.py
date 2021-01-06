@@ -1,4 +1,5 @@
 import os
+import random
 import sys
 
 import pygame
@@ -65,9 +66,70 @@ def start_screen():
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                perehod('z')
                 return
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+                perehod('s')
+                return
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                terminate()
         pygame.display.flip()
         clock.tick(FPS)
 
 
+def perehod(key):
+    time = 0
+    running = True
+    while running and time < 30:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        clock = pygame.time.Clock()
+        for i in range(10000):
+            screen.fill(pygame.Color('black'),
+                        (random.random() * width,
+                         random.random() * height, 1, 1))
+        pygame.display.flip()
+        clock.tick(FPS)
+        time += 0.1
+    if time >= 30 and key == 'z':
+        game_window()
+        return
+    if time >= 30 and key == 's':
+        results()
+        return
+
+
+def game_window():
+    g = 1
+    stars = []
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        clock = pygame.time.Clock()
+        if g <= 200:
+            for i in range(25):
+                star_x = random.random() * width
+                star_y = random.random() * height
+                screen.fill(pygame.Color('white'),
+                            (star_x,
+                             star_y, 1, 1))
+                stars.append([star_x, star_y])
+        else:
+            for i in range(5000):
+                screen.fill(pygame.Color('white'),
+                            (stars[i][0],
+                             stars[i][1], 1, 1))
+        pygame.display.flip()
+        clock.tick(FPS)
+        g += 1
+
+
+def results():
+    pass
+
+
 start_screen()
+terminate()
