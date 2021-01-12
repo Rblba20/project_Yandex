@@ -1,5 +1,7 @@
+# Images from https://opengameart.org/content/space-shooter-redux" (by Kenney.nl)
 import os
 import random
+import sys
 
 import pygame
 
@@ -8,116 +10,129 @@ pygame.display.set_caption('Star Fighter')
 size = width, height = 650, 675
 screen = pygame.display.set_mode(size)
 
-
-def load_image(name, colorkey=None):
-    fullname = os.path.join('data', name)
-    image = pygame.image.load(fullname)
-    if colorkey is not None:
-        image = image.convert()
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey)
-    else:
-        image = image.convert_alpha()
-    return image
+FPS = 50
 
 
-all_sprites = pygame.sprite.Group()
-black_plane = pygame.sprite.Sprite()
-black_plane.image = load_image("player_cadet_n1_black.png")
-black_plane.rect = black_plane.image.get_rect()
-all_sprites.add(black_plane)
-black_plane.rect.x = 20
-black_plane.rect.y = 140
-letter_A_image = load_image("A.png")
-letter_A = pygame.sprite.Sprite(all_sprites)
-letter_A.image = letter_A_image
-letter_A.rect = letter_A.image.get_rect()
-letter_A.rect.x = 60
-letter_A.rect.y = 40
-pink_plane_image = load_image("player_cadet_n1_pink.png")
-pink_plane = pygame.sprite.Sprite(all_sprites)
-pink_plane.image = pink_plane_image
-pink_plane.rect = pink_plane.image.get_rect()
-pink_plane.rect.x = 20
-pink_plane.rect.y = 290
-letter_D_image = load_image("B.png")
-letter_D = pygame.sprite.Sprite(all_sprites)
-letter_D.image = letter_D_image
-letter_D.rect = letter_D.image.get_rect()
-letter_D.rect.x = 50
-letter_D.rect.y = 260
-blue_plane_image = load_image("player_cadet_n1_blue.png")
-blue_plane = pygame.sprite.Sprite(all_sprites)
-blue_plane.image = blue_plane_image
-blue_plane.rect = blue_plane.image.get_rect()
-blue_plane.rect.x = 220
-blue_plane.rect.y = 220
-letter_C_image = load_image("C.png")
-letter_C = pygame.sprite.Sprite(all_sprites)
-letter_C.image = letter_C_image
-letter_C.rect = letter_C.image.get_rect()
-letter_C.rect.x = 250
-letter_C.rect.y = 180
-green_plane_image = load_image("player_cadet_n1_green.png")
-green_plane = pygame.sprite.Sprite(all_sprites)
-green_plane.image = green_plane_image
-green_plane.rect = green_plane.image.get_rect()
-green_plane.rect.x = 450
-green_plane.rect.y = 150
-letter_D_image = load_image("D.png")
-letter_D = pygame.sprite.Sprite(all_sprites)
-letter_D.image = letter_D_image
-letter_D.rect = letter_D.image.get_rect()
-letter_D.rect.x = 500
-letter_D.rect.y = 70
-red_plane_image = load_image("player_cadet_n1_red.png")
-red_plane = pygame.sprite.Sprite(all_sprites)
-red_plane.image = red_plane_image
-red_plane.rect = red_plane.image.get_rect()
-red_plane.rect.x = 450
-red_plane.rect.y = 300
-letter_E_image = load_image("E.png")
-letter_E = pygame.sprite.Sprite(all_sprites)
-letter_E.image = letter_E_image
-letter_E.rect = letter_E.image.get_rect()
-letter_E.rect.x = 450
-letter_E.rect.y = 280
+class Choose:
 
+    def __init__(self, stars):
+        self.stars = stars
 
+    def terminate(self):
+        pygame.quit()
+        sys.exit()
 
+    def start_screen(self):
+        intro_text = ["[A]      [F]", "",
+                      "[S]      [G]", "",
+                      "[D]      [H]", ""]
+        rights = ["Выберите космический корабль,", "которым вы будете управлять",
+                  "Images made by Kenney.nl"]
 
-
-running = True
-i = 0
-stars = []
-while running:
-    screen.fill(pygame.Color('black'))
-    if i == 0:
-        for i in range(5000):
-            a = random.random() * width
-            b = random.random() * height
-            screen.fill(pygame.Color('white'),
-                        (a,
-                         b, 1, 1))
-            stars.append([a, b])
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            all_sprites.draw(screen)
+        font = pygame.font.Font('data/text.ttf', 70)
+        font_ = pygame.font.Font('data/text.ttf', 35)
+        text_coord = 50
+        for line in intro_text:
+            string_rendered = font.render(line, 1, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+        for line in rights:
+            string_rendered = font_.render(line, 1, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+        clock = pygame.time.Clock()
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                    running = False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
+                    pass
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+                    pass
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_d:
+                    pass
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_f:
+                    pass
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
+                    pass
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_h:
+                    pass
             pygame.display.flip()
-    else:
+            clock.tick(FPS)
+
+    def load_image(self, name, colorkey=None):
+        fullname = os.path.join('data', name)
+        image = pygame.image.load(fullname)
+        if colorkey is not None:
+            image = image.convert()
+            if colorkey == -1:
+                colorkey = image.get_at((0, 0))
+            image.set_colorkey(colorkey)
+        else:
+            image = image.convert_alpha()
+        return image
+
+    all_sprites = pygame.sprite.Group()
+    red_plane_A = pygame.sprite.Sprite()
+    red_plane_A.image = load_image("playerShip1_red.png")
+    red_plane_A.rect = red_plane_A.image.get_rect()
+    all_sprites.add(red_plane_A)
+    red_plane_A.rect.x = 120
+    red_plane_A.rect.y = 50
+    blue_plane_S = pygame.sprite.Sprite()
+    blue_plane_S.image = load_image("playerShip2_blue.png")
+    blue_plane_S.rect = blue_plane_S.image.get_rect()
+    all_sprites.add(blue_plane_S)
+    blue_plane_S.rect.x = 120
+    blue_plane_S.rect.y = 210
+    green_plane_D = pygame.sprite.Sprite()
+    green_plane_D.image = load_image("playerShip3_green.png")
+    green_plane_D.rect = green_plane_D.image.get_rect()
+    all_sprites.add(green_plane_D)
+    green_plane_D.rect.x = 120
+    green_plane_D.rect.y = 370
+    green_plane_second_version_F = pygame.sprite.Sprite()
+    green_plane_second_version_F.image = load_image("playerShip1_green.png")
+    green_plane_second_version_F.rect = green_plane_second_version_F.image.get_rect()
+    all_sprites.add(green_plane_second_version_F)
+    green_plane_second_version_F.rect.x = 480
+    green_plane_second_version_F.rect.y = 50
+    blue_plane_second_version_G = pygame.sprite.Sprite()
+    blue_plane_second_version_G.image = load_image("playerShip2_orange.png")
+    blue_plane_second_version_G.rect = blue_plane_second_version_G.image.get_rect()
+    all_sprites.add(blue_plane_second_version_G)
+    blue_plane_second_version_G.rect.x = 480
+    blue_plane_second_version_G.rect.y = 210
+    red_plane_second_version_H = pygame.sprite.Sprite()
+    red_plane_second_version_H.image = load_image("playerShip3_red.png")
+    red_plane_second_version_H.rect = red_plane_second_version_H.image.get_rect()
+    all_sprites.add(red_plane_second_version_H)
+    red_plane_second_version_H.rect.x = 480
+    red_plane_second_version_H.rect.y = 370
+
+    running = True
+    while running:
         for i in range(5000):
             screen.fill(pygame.Color('white'),
                         (stars[i][0],
                          stars[i][1], 1, 1))
+        all_sprites.draw(screen)
+        start_screen()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-                pass
             all_sprites.draw(screen)
             all_sprites.update(event)
             pygame.display.flip()
-    i += 1
-pygame.quit()
+    pygame.quit()

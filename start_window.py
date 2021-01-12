@@ -128,7 +128,30 @@ def game_window():
 
 
 def results():
-    pass
+    g = 1
+    stars = []
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        clock = pygame.time.Clock()
+        if g <= 40:
+            for i in range(25):
+                star_x = random.random() * width
+                star_y = random.random() * height
+                screen.fill(pygame.Color('white'),
+                            (star_x,
+                             star_y, 1, 1))
+                stars.append([star_x, star_y])
+        else:
+            for i in range(1000):
+                screen.fill(pygame.Color('white'),
+                            (stars[i][0],
+                             stars[i][1], 1, 1))
+        pygame.display.flip()
+        clock.tick(FPS)
+        g += 1
 
 
 start_screen()
