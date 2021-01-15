@@ -121,12 +121,15 @@ class Choose:
     red_plane_second_version_H.rect.x = 480
     red_plane_second_version_H.rect.y = 370
 
+    def stars_(self):
+        return self.stars
+
     running = True
     while running:
         for i in range(5000):
             screen.fill(pygame.Color('white'),
-                        (stars[i][0],
-                         stars[i][1], 1, 1))
+                        (stars_()[i][0],
+                         stars_()[i][1], 1, 1))
         all_sprites.draw(screen)
         start_screen()
         for event in pygame.event.get():
