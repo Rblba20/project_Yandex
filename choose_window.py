@@ -1,4 +1,5 @@
 # Images from https://opengameart.org/content/space-shooter-redux" (by Kenney.nl)
+from start_window import stars as stars_w
 import os
 import random
 import sys
@@ -83,56 +84,60 @@ class Choose:
             image = image.convert_alpha()
         return image
 
-    all_sprites = pygame.sprite.Group()
-    red_plane_A = pygame.sprite.Sprite()
-    red_plane_A.image = load_image("playerShip1_red.png")
-    red_plane_A.rect = red_plane_A.image.get_rect()
-    all_sprites.add(red_plane_A)
-    red_plane_A.rect.x = 120
-    red_plane_A.rect.y = 50
-    blue_plane_S = pygame.sprite.Sprite()
-    blue_plane_S.image = load_image("playerShip2_blue.png")
-    blue_plane_S.rect = blue_plane_S.image.get_rect()
-    all_sprites.add(blue_plane_S)
-    blue_plane_S.rect.x = 120
-    blue_plane_S.rect.y = 210
-    green_plane_D = pygame.sprite.Sprite()
-    green_plane_D.image = load_image("playerShip3_green.png")
-    green_plane_D.rect = green_plane_D.image.get_rect()
-    all_sprites.add(green_plane_D)
-    green_plane_D.rect.x = 120
-    green_plane_D.rect.y = 370
-    green_plane_second_version_F = pygame.sprite.Sprite()
-    green_plane_second_version_F.image = load_image("playerShip1_green.png")
-    green_plane_second_version_F.rect = green_plane_second_version_F.image.get_rect()
-    all_sprites.add(green_plane_second_version_F)
-    green_plane_second_version_F.rect.x = 480
-    green_plane_second_version_F.rect.y = 50
-    blue_plane_second_version_G = pygame.sprite.Sprite()
-    blue_plane_second_version_G.image = load_image("playerShip2_orange.png")
-    blue_plane_second_version_G.rect = blue_plane_second_version_G.image.get_rect()
-    all_sprites.add(blue_plane_second_version_G)
-    blue_plane_second_version_G.rect.x = 480
-    blue_plane_second_version_G.rect.y = 210
-    red_plane_second_version_H = pygame.sprite.Sprite()
-    red_plane_second_version_H.image = load_image("playerShip3_red.png")
-    red_plane_second_version_H.rect = red_plane_second_version_H.image.get_rect()
-    all_sprites.add(red_plane_second_version_H)
-    red_plane_second_version_H.rect.x = 480
-    red_plane_second_version_H.rect.y = 370
+    def sprites(self):
+        all_sprites = pygame.sprite.Group()
+        red_plane_A = pygame.sprite.Sprite()
+        red_plane_A.image = self.load_image("playerShip1_red.png")
+        red_plane_A.rect = red_plane_A.image.get_rect()
+        all_sprites.add(red_plane_A)
+        red_plane_A.rect.x = 120
+        red_plane_A.rect.y = 50
+        blue_plane_S = pygame.sprite.Sprite()
+        blue_plane_S.image = self.load_image("playerShip2_blue.png")
+        blue_plane_S.rect = blue_plane_S.image.get_rect()
+        all_sprites.add(blue_plane_S)
+        blue_plane_S.rect.x = 120
+        blue_plane_S.rect.y = 210
+        green_plane_D = pygame.sprite.Sprite()
+        green_plane_D.image = self.load_image("playerShip3_green.png")
+        green_plane_D.rect = green_plane_D.image.get_rect()
+        all_sprites.add(green_plane_D)
+        green_plane_D.rect.x = 120
+        green_plane_D.rect.y = 370
+        green_plane_second_version_F = pygame.sprite.Sprite()
+        green_plane_second_version_F.image = self.load_image("playerShip1_green.png")
+        green_plane_second_version_F.rect = green_plane_second_version_F.image.get_rect()
+        all_sprites.add(green_plane_second_version_F)
+        green_plane_second_version_F.rect.x = 480
+        green_plane_second_version_F.rect.y = 50
+        blue_plane_second_version_G = pygame.sprite.Sprite()
+        blue_plane_second_version_G.image = self.load_image("playerShip2_orange.png")
+        blue_plane_second_version_G.rect = blue_plane_second_version_G.image.get_rect()
+        all_sprites.add(blue_plane_second_version_G)
+        blue_plane_second_version_G.rect.x = 480
+        blue_plane_second_version_G.rect.y = 210
+        red_plane_second_version_H = pygame.sprite.Sprite()
+        red_plane_second_version_H.image = self.load_image("playerShip3_red.png")
+        red_plane_second_version_H.rect = red_plane_second_version_H.image.get_rect()
+        all_sprites.add(red_plane_second_version_H)
+        red_plane_second_version_H.rect.x = 480
+        red_plane_second_version_H.rect.y = 370
+        self.choose_player(all_sprites)
 
-    running = True
-    while running:
-        for i in range(5000):
-            screen.fill(pygame.Color('white'),
-                        (stars[i][0],
-                         stars[i][1], 1, 1))
-        all_sprites.draw(screen)
-        start_screen()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+    def choose_player(self, all_sprites):
+        running = True
+        while running:
+            for i in range(5000):
+                screen.fill(pygame.Color('white'),
+                            (self.stars[i][0],
+                             self.stars[i][1], 1, 1))
             all_sprites.draw(screen)
-            all_sprites.update(event)
-            pygame.display.flip()
-    pygame.quit()
+            self.start_screen()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                all_sprites.draw(screen)
+                all_sprites.update(event)
+                pygame.display.flip()
+        pygame.quit()
+
