@@ -6,8 +6,8 @@ from os import path
 img_dir = path.join(path.dirname(__file__), 'data')
 snd_dir = path.join(path.dirname(__file__), 'data')
 
-WIDTH = 480
-HEIGHT = 600
+WIDTH = 650
+HEIGHT = 675
 FPS = 60
 
 WHITE = (255, 255, 255)
