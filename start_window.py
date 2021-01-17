@@ -8,6 +8,14 @@ pygame.init()
 pygame.display.set_caption('Star Fighter')
 size = width, height = 650, 675
 screen = pygame.display.set_mode(size)
+stars = []
+for i in range(5000):
+    star_x = random.random() * width
+    star_y = random.random() * height
+    screen.fill(pygame.Color('white'),
+                (star_x,
+                 star_y, 1, 1))
+    stars.append([star_x, star_y])
 
 
 def load_image(name, colorkey=None):
@@ -31,7 +39,7 @@ def terminate():
     sys.exit()
 
 
-def start_screen():
+def start_screen(stars):
     intro_text = ["  Star Fighter", "",
                   "[Z]Играть",
                   "[S]Результаты",
@@ -66,10 +74,10 @@ def start_screen():
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-                perehod('z')
+                perehod('z', stars)
                 return
             if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-                perehod('s')
+                perehod('s', stars)
                 return
             if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
                 terminate()
@@ -77,7 +85,7 @@ def start_screen():
         clock.tick(FPS)
 
 
-def perehod(key):
+def perehod(key, stars):
     time = 0
     running = True
     while running and time < 30:
@@ -93,16 +101,15 @@ def perehod(key):
         clock.tick(FPS)
         time += 0.1
     if time >= 30 and key == 'z':
-        game_window()
+        game_window(stars)
         return
     if time >= 30 and key == 's':
-        results()
+        results(stars)
         return
 
 
-def game_window():
+def game_window(stars):
     g = 1
-    stars = []
     running = True
     while running:
         for event in pygame.event.get():
@@ -111,12 +118,9 @@ def game_window():
         clock = pygame.time.Clock()
         if g <= 200:
             for i in range(25):
-                star_x = random.random() * width
-                star_y = random.random() * height
                 screen.fill(pygame.Color('white'),
-                            (star_x,
-                             star_y, 1, 1))
-                stars.append([star_x, star_y])
+                            (stars[25 * (g - 1) + i][0],
+                             stars[25 * (g - 1) + i][1], 1, 1))
         else:
             for i in range(5000):
                 screen.fill(pygame.Color('white'),
@@ -124,12 +128,13 @@ def game_window():
                              stars[i][1], 1, 1))
         pygame.display.flip()
         clock.tick(FPS)
+        if g > 200:
+            return
         g += 1
 
 
-def results():
+def results(stars):
     g = 1
-    stars = []
     running = True
     while running:
         for event in pygame.event.get():
@@ -138,21 +143,20 @@ def results():
         clock = pygame.time.Clock()
         if g <= 40:
             for i in range(25):
-                star_x = random.random() * width
-                star_y = random.random() * height
                 screen.fill(pygame.Color('white'),
-                            (star_x,
-                             star_y, 1, 1))
-                stars.append([star_x, star_y])
+                            (stars[25 * (g - 1) + i][0],
+                             stars[25 * (g - 1) + i][1], 1, 1))
         else:
-            for i in range(1000):
+            for i in range(5000):
                 screen.fill(pygame.Color('white'),
                             (stars[i][0],
                              stars[i][1], 1, 1))
         pygame.display.flip()
         clock.tick(FPS)
+        if g > 200:
+            return
         g += 1
 
 
-start_screen()
+start_screen(stars)
 terminate()

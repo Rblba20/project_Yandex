@@ -1,8 +1,13 @@
 import pygame
 import random
+from os import path
 
-WIDTH = 480
-HEIGHT = 600
+# import choose_window as choose_
+
+img_dir = path.join(path.dirname(__file__), 'data')
+
+WIDTH = 650
+HEIGHT = 675
 FPS = 60
 
 WHITE = (255, 255, 255)
@@ -22,9 +27,10 @@ clock = pygame.time.Clock()
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((50, 40))
-        self.image.fill(GREEN)
+        self.image = pygame.transform.scale(player_img, (50, 38))
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
+        self.radius = 20
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
@@ -51,15 +57,32 @@ class Player(pygame.sprite.Sprite):
 class Mob(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((30, 40))
-        self.image.fill(RED)
+        self.image_orig = random.choice(meteor_images)
+        self.image_orig.set_colorkey(BLACK)
+        self.image = self.image_orig.copy()
         self.rect = self.image.get_rect()
+        self.radius = int(self.rect.width * .85 / 2)
         self.rect.x = random.randrange(WIDTH - self.rect.width)
-        self.rect.y = random.randrange(-100, -40)
+        self.rect.y = random.randrange(-150, -100)
         self.speedy = random.randrange(1, 8)
         self.speedx = random.randrange(-3, 3)
+        self.rot = 0
+        self.rot_speed = random.randrange(-8, 8)
+        self.last_update = pygame.time.get_ticks()
+
+    def rotate(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_update > 50:
+            self.last_update = now
+            self.rot = (self.rot + self.rot_speed) % 360
+            new_image = pygame.transform.rotate(self.image_orig, self.rot)
+            old_center = self.rect.center
+            self.image = new_image
+            self.rect = self.image.get_rect()
+            self.rect.center = old_center
 
     def update(self):
+        self.rotate()
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
@@ -71,8 +94,8 @@ class Mob(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((10, 20))
-        self.image.fill(YELLOW)
+        self.image = bullet_img
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.bottom = y
         self.rect.centerx = x
@@ -83,6 +106,18 @@ class Bullet(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
 
+
+#background = pygame.image.load(path.join(img_dir, "fon.jpg")).convert()
+#background_rect = background.get_rect()
+text = open("plane.txt", encoding='utf8').read()
+player_img = pygame.image.load(path.join(img_dir, text)).convert()
+bullet_img = pygame.image.load(path.join(img_dir, "laserRed05.png")).convert()
+meteor_images = []
+meteor_list = ['meteorBrown_big1.png', 'meteorBrown_med1.png', 'meteorBrown_med1.png',
+               'meteorBrown_med3.png', 'meteorBrown_small1.png', 'meteorBrown_small2.png',
+               'meteorBrown_tiny1.png']
+for img in meteor_list:
+    meteor_images.append(pygame.image.load(path.join(img_dir, img)).convert())
 
 all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
@@ -95,6 +130,8 @@ for i in range(8):
     mobs.add(m)
 
 running = True
+stars = open("stars.txt", 'r', encoding='utf8').read()
+stars = stars.split('\n')
 while running:
     clock.tick(FPS)
     for event in pygame.event.get():
@@ -103,7 +140,6 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 player.shoot()
-
     all_sprites.update()
 
     hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
@@ -112,11 +148,16 @@ while running:
         all_sprites.add(m)
         mobs.add(m)
 
-    hits = pygame.sprite.spritecollide(player, mobs, False)
+    hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_circle)
     if hits:
         running = False
 
     screen.fill(BLACK)
+    for i in range(5000):
+        screen.fill(pygame.Color('white'),
+                    (float(stars[i + 0]),
+                     float(stars[i + 1]), 1, 1))
+   # screen.blit(background, background_rect)
     all_sprites.draw(screen)
     pygame.display.flip()
 
