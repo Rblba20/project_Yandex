@@ -1,13 +1,13 @@
+# Art from Kenney.nl
 import pygame
 import random
 from os import path
 
-# import choose_window as choose_
-
 img_dir = path.join(path.dirname(__file__), 'data')
+snd_dir = path.join(path.dirname(__file__), 'data')
 
-WIDTH = 650
-HEIGHT = 675
+WIDTH = 480
+HEIGHT = 600
 FPS = 60
 
 WHITE = (255, 255, 255)
@@ -22,6 +22,16 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Star Fighter")
 clock = pygame.time.Clock()
+
+font_name = pygame.font.match_font('arial')
+
+
+def draw_text(surf, text, size, x, y):
+    font = pygame.font.Font(font_name, size)
+    text_surface = font.render(text, True, WHITE)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    surf.blit(text_surface, text_rect)
 
 
 class Player(pygame.sprite.Sprite):
@@ -52,6 +62,7 @@ class Player(pygame.sprite.Sprite):
         bullet = Bullet(self.rect.centerx, self.rect.top)
         all_sprites.add(bullet)
         bullets.add(bullet)
+        shoot_sound.play()
 
 
 class Mob(pygame.sprite.Sprite):
@@ -107,8 +118,6 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 
-#background = pygame.image.load(path.join(img_dir, "fon.jpg")).convert()
-#background_rect = background.get_rect()
 text = open("plane.txt", encoding='utf8').read()
 player_img = pygame.image.load(path.join(img_dir, text)).convert()
 bullet_img = pygame.image.load(path.join(img_dir, "laserRed05.png")).convert()
@@ -118,6 +127,10 @@ meteor_list = ['meteorBrown_big1.png', 'meteorBrown_med1.png', 'meteorBrown_med1
                'meteorBrown_tiny1.png']
 for img in meteor_list:
     meteor_images.append(pygame.image.load(path.join(img_dir, img)).convert())
+shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'pew.wav'))
+expl_sounds = []
+for snd in ['expl3.wav', 'expl6.wav']:
+    expl_sounds.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
 
 all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
@@ -128,6 +141,7 @@ for i in range(8):
     m = Mob()
     all_sprites.add(m)
     mobs.add(m)
+score = 0
 
 running = True
 stars = open("stars.txt", 'r', encoding='utf8').read()
@@ -140,10 +154,13 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 player.shoot()
+
     all_sprites.update()
 
     hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
     for hit in hits:
+        score += 50 - hit.radius
+        random.choice(expl_sounds).play()
         m = Mob()
         all_sprites.add(m)
         mobs.add(m)
@@ -153,12 +170,13 @@ while running:
         running = False
 
     screen.fill(BLACK)
+
+    all_sprites.draw(screen)
     for i in range(5000):
         screen.fill(pygame.Color('white'),
                     (float(stars[i + 0]),
                      float(stars[i + 1]), 1, 1))
-   # screen.blit(background, background_rect)
-    all_sprites.draw(screen)
+    draw_text(screen, str(score), 18, WIDTH / 2, 10)
     pygame.display.flip()
 
 pygame.quit()
