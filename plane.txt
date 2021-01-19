@@ -1,1 +1,1 @@
-playerShip1_red.png
+playerShip2_orange.png
