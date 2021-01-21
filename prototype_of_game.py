@@ -2,11 +2,12 @@
 import pygame
 import random
 from os import path
+import os
 
 img_dir = path.join(path.dirname(__file__), 'data')
 snd_dir = path.join(path.dirname(__file__), 'data')
 
-WIDTH = 659
+WIDTH = 650
 HEIGHT = 675
 FPS = 60
 POWERUP_TIME = 5000
@@ -41,7 +42,7 @@ def newmob():
     mobs.add(m)
 
 
-def draw_shield_bar(surf, x, y, pct):
+def draw_hp_bar(surf, x, y, pct):
     if pct < 0:
         pct = 0
     BAR_LENGTH = 100
@@ -59,6 +60,27 @@ def draw_lives(surf, x, y, lives, img):
         img_rect.x = x + 30 * i
         img_rect.y = y
         surf.blit(img, img_rect)
+
+
+def show_go_screen():
+    if start > 0:
+        background = pygame.image.load(path.join(img_dir, "fon.jpg")).convert()
+        background_rect = background.get_rect()
+        screen.blit(background, background_rect)
+        draw_text(screen, "Star Fighter", 64, WIDTH / 2, HEIGHT / 4)
+        draw_text(screen, "Вы проиграли?", 22,
+                  WIDTH / 2, HEIGHT / 2)
+        draw_text(screen, "Нажмите F, чтобы продолжить", 18, WIDTH / 2, HEIGHT * 3 / 4)
+        pygame.display.flip()
+        waiting = True
+        while waiting:
+            clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_f:
+                    waiting = False
+        os.system('python test_game.py')
 
 
 class Player(pygame.sprite.Sprite):
@@ -277,10 +299,26 @@ for i in range(8):
     newmob()
 score = 0
 
+game_over = True
 running = True
 stars = open("stars.txt", 'r', encoding='utf8').read()
 stars = stars.split('\n')
+start = 0
 while running:
+    if game_over:
+        show_go_screen()
+        start += 1
+        game_over = False
+        all_sprites = pygame.sprite.Group()
+        mobs = pygame.sprite.Group()
+        bullets = pygame.sprite.Group()
+        powerups = pygame.sprite.Group()
+        player = Player()
+        all_sprites.add(player)
+        for i in range(8):
+            newmob()
+        score = 0
+
     clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -324,9 +362,8 @@ while running:
             player.powerup()
             power_sound.play()
 
-
     if player.lives == 0 and not death_explosion.alive():
-        running = False
+        game_over = True
 
     screen.fill(BLACK)
     for i in range(5000):
@@ -335,7 +372,7 @@ while running:
                      float(stars[i + 1]), 1, 1))
     all_sprites.draw(screen)
     draw_text(screen, str(score), 18, WIDTH / 2, 10)
-    draw_shield_bar(screen, 5, 5, player.shield)
+    draw_hp_bar(screen, 5, 5, player.shield)
     draw_lives(screen, WIDTH - 100, 5, player.lives,
                player_mini_img)
     pygame.display.flip()
