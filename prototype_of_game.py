@@ -1,8 +1,13 @@
 # Art from Kenney.nl
+import datetime
+import sqlite3
+import sys
+
 import pygame
 import random
 from os import path
 import os
+from subprocess import Popen
 
 img_dir = path.join(path.dirname(__file__), 'data')
 snd_dir = path.join(path.dirname(__file__), 'data')
@@ -80,7 +85,7 @@ def show_go_screen():
                     pygame.quit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_f:
                     waiting = False
-        os.system('python test_game.py')
+        from test_game import start_screen
 
 
 class Player(pygame.sprite.Sprite):
@@ -306,6 +311,18 @@ stars = stars.split('\n')
 start = 0
 while running:
     if game_over:
+        if score != 0:
+            data_time = datetime.datetime.now()
+            conn = sqlite3.connect('data/scores.db')
+            cr = conn.cursor()
+            cr.execute("""INSERT INTO results(DATE_TIME,SCORE) VALUES(?,?)""",
+                       (data_time.strftime('%d-%m-%Y %H:%M:%S'), score))
+            # SELECT SCORE FROM results
+            #     WHERE SCORE > 0
+            conn.commit()
+            conn.close()
+            print(score)
+            print(data_time.strftime('%d-%m-%Y %H:%M:%S'))
         show_go_screen()
         start += 1
         game_over = False
@@ -323,6 +340,18 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+            draw_text(screen, "Пауза", 64, WIDTH / 2, HEIGHT / 4)
+            draw_text(screen, "Нажмите F, чтобы продолжить", 18, WIDTH / 2, HEIGHT * 3 / 4)
+            pygame.display.flip()
+            waiting = True
+            while waiting:
+                clock.tick(FPS)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_f:
+                        waiting = False
 
     all_sprites.update()
 
