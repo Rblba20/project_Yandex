@@ -158,6 +158,14 @@ def results():
                              stars[i][1], 1, 1))
         pygame.display.flip()
         clock.tick(FPS)
+        if g > 45:
+            new_list = []
+            for i in stars:
+                for j in i:
+                    new_list.append(str(j) + '\n')
+            with open('stars_res.txt', 'w') as f:
+                f.writelines(new_list)
+            import results_screen
         g += 1
 
 

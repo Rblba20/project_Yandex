@@ -1,13 +1,10 @@
 # Art from Kenney.nl
 import datetime
 import sqlite3
-import sys
 
 import pygame
 import random
 from os import path
-import os
-from subprocess import Popen
 
 img_dir = path.join(path.dirname(__file__), 'data')
 snd_dir = path.join(path.dirname(__file__), 'data')
