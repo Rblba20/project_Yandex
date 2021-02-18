@@ -6,14 +6,18 @@ import pygame
 import random
 from os import path
 
+from pygame.math import Vector2
+
 img_dir = path.join(path.dirname(__file__), 'data')
 snd_dir = path.join(path.dirname(__file__), 'data')
 
 WIDTH = 650
 HEIGHT = 675
+width, height = WIDTH, HEIGHT
 FPS = 60
 POWERUP_TIME = 5000
-
+score = 0
+all_sprites = pygame.sprite.Group()
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -36,13 +40,6 @@ def draw_text(surf, text, size, x, y):
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
-
-
-def newmob():
-    m = Mob()
-    all_sprites.add(m)
-    mobs.add(m)
-
 
 def draw_hp_bar(surf, x, y, pct):
     if pct < 0:
@@ -249,6 +246,132 @@ class Explosion(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 self.rect.center = center
 
+delay = []
+for i in range(1000, 1750):
+    delay.append(i)
+point = []
+for i in range(10, 500):
+    point.append(i)
+
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, radius, x, y, x_, y_, projectiles, enemy_images, delay, point):
+        super().__init__(all_sprites)
+        self.radius = radius
+        img_dir = path.join(path.dirname(__file__), 'data')
+        enemy_images = []
+        enemy_list = ['enemyBlack1.png', 'enemyBlue2.png', 'enemyGreen3.png',
+                      'enemyRed4.png']
+        for img in enemy_list:
+            enemy_images.append(pygame.image.load(path.join(img_dir, img)).convert())
+        self.image_orig = random.choice(enemy_images)
+        self.image_orig.set_colorkey(BLACK)
+        self.image = self.image_orig.copy()
+       # self.rect = self.image.get_rect()
+      #  self.radius = int(self.rect.width * .85 / 2)
+      #  self.rect.x = random.randrange(width - self.rect.width)
+       # self.rect.y = random.randrange(-150, -100)
+    #    self.speedy = random.randrange(1, 8)
+      #  self.speedx = random.randrange(-3, 3)
+    #    self.rot = 0
+     #   self.rot_speed = random.randrange(-8, 8)
+        self.last_update = pygame.time.get_ticks()
+        self.rect = pygame.Rect(random.choice(point), random.choice(point), 2 * radius, 2 * radius)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(WIDTH - self.rect.width)
+        self.rect.y = random.randrange(100, 240)
+        self.vx = random.randint(-5, 5)
+        self.vy = random.randrange(-5, 5)
+        self.previous_time = pygame.time.get_ticks()
+        self.shoot_delay = random.choice(delay)
+        self.speed = 1
+        self.projectiles = projectiles
+
+
+    def update(self):
+        if self.rect.top > height + 10 or self.rect.left < -25 or self.rect.right > width + 20:
+            self.rect.x = random.randrange(width - self.rect.width)
+            self.rect.y = random.randrange(-100, -40)
+            self.speedy = random.randrange(1, 8)
+        self.rect = self.rect.move(self.vx, self.vy)
+        if pygame.sprite.spritecollideany(self, horizontal_borders):
+            self.vy = -self.vy
+        if pygame.sprite.spritecollideany(self, vertical_borders):
+            self.vx = -self.vx
+        now = pygame.time.get_ticks()
+        if now - self.previous_time > self.shoot_delay:
+            self.previous_time = now
+            vel = Vector2(self.speed, 31)
+            self.projectiles.add(Projectile(self.rect.x, self.rect.y, vel, self.rect.centerx, self.rect.top))
+
+class Projectile(pygame.sprite.Sprite):
+
+    def __init__(self, x, y, vel, centerx, top):
+        super().__init__()
+        self.image = random.choice(bullet_images)
+        self.rect = self.image.get_rect(topleft=(centerx, top))
+        self.vel = Vector2(vel)
+        shoot_sound.play()
+
+    def update(self):
+        self.rect.move_ip(self.vel)
+
+bullet_images = []
+bullet_list = ['laserBlue05.png', 'laserGreen05.png', 'laserRed01.png',
+               'laserRed05.png']
+for img in bullet_list:
+    bullet_images.append(pygame.image.load(path.join(img_dir, img)).convert())
+bullet_img = pygame.image.load(path.join(img_dir, "laserBlue05.png")).convert()
+enemy_images = []
+enemy_list = ['enemyBlack1.png', 'enemyBlue2.png', 'enemyGreen3.png',
+              'enemyRed4.png']
+for img in enemy_list:
+    enemy_images.append(pygame.image.load(path.join(img_dir, img)).convert())
+
+all_sprites_list = pygame.sprite.Group()
+projectiles = pygame.sprite.Group()
+enemy_sprites = pygame.sprite.Group()
+if score > 0:
+    enemy = Enemy(20, 100, 100, 150, 150, projectiles, enemy_images, delay, point)
+    enemy_sprites.add(enemy)
+
+
+
+horizontal_borders = pygame.sprite.Group()
+vertical_borders = pygame.sprite.Group()
+
+
+class Border(pygame.sprite.Sprite):
+    # ÑÑ‚Ñ€Ð¾Ð³Ð¾ Ð²ÐµÑ€Ñ‚Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ð¹ Ð¸Ð»Ð¸ ÑÑ‚Ñ€Ð¾Ð³Ð¾ Ð³Ð¾Ñ€Ð¸Ð·Ð¾Ð½Ñ‚Ð°Ð»ÑŒÐ½Ñ‹Ð¹ Ð¾Ñ‚Ñ€ÐµÐ·Ð¾Ðº
+    def __init__(self, x1, y1, x2, y2):
+        super().__init__(all_sprites)
+        if x1 == x2:  # Ð²ÐµÑ€Ñ‚Ð¸ÐºÐ°Ð»ÑŒÐ½Ð°Ñ ÑÑ‚ÐµÐ½ÐºÐ°
+            self.add(vertical_borders)
+            self.image = pygame.Surface([1, y2 - y1])
+            self.rect = pygame.Rect(x1, y1, 1, y2 - y1)
+        else:  # Ð³Ð¾Ñ€Ð¸Ð·Ð¾Ð½Ñ‚Ð°Ð»ÑŒÐ½Ð°Ñ ÑÑ‚ÐµÐ½ÐºÐ°
+            self.add(horizontal_borders)
+            self.image = pygame.Surface([x2 - x1, 1])
+            self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
+
+
+Border(5, 5, width - 5, 5)
+Border(5, height - 5, width - 5, height - 5)
+Border(5, 5, 5, height - 5)
+Border(width - 5, 5, width - 5, height - 5)
+if score > 0:
+    for i in range(10):
+        Enemy(20, 100, 100, 150, 150, projectiles, enemy_images, delay, point)
+
+def newmob():
+    m = Mob()
+    all_sprites.add(m)
+    mobs.add(m)
+
+def newenemy():
+    if score > 0:
+        m = Enemy(20, 100, 100, 150, 150, projectiles, enemy_images, delay, point)
+        all_sprites.add(m)
+        mobs.add(m)
 
 text = open("plane.txt", encoding='utf8').read()
 player_img = pygame.image.load(path.join(img_dir, text)).convert()
@@ -312,8 +435,14 @@ while running:
             data_time = datetime.datetime.now()
             conn = sqlite3.connect('data/scores.db')
             cr = conn.cursor()
+            similar = cr.execute("""SELECT * FROM results WHERE SCORE == ?""",
+                       (score, )).fetchall()
+            print(similar)
+            if similar == []:
+                cr.execute("""DELETE from results where SCORE == ?""",
+                           (score, ))
             cr.execute("""INSERT INTO results(DATE_TIME,SCORE) VALUES(?,?)""",
-                       (data_time.strftime('%d-%m-%Y %H:%M:%S'), score))
+                        (data_time.strftime('%d-%m-%Y %H:%M:%S'), score))
             # SELECT SCORE FROM results
             #     WHERE SCORE > 0
             conn.commit()
@@ -362,7 +491,10 @@ while running:
             pow = Pow(hit.rect.center)
             all_sprites.add(pow)
             powerups.add(pow)
-        newmob()
+        if score <= 500:
+            newmob()
+        elif score > 500:
+            newenemy()
 
     hits = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_circle)
     for hit in hits:
@@ -370,6 +502,16 @@ while running:
         expl = Explosion(hit.rect.center, 'sm')
         all_sprites.add(expl)
         newmob()
+        if player.shield <= 0:
+            death_explosion = Explosion(player.rect.center, 'player')
+            all_sprites.add(death_explosion)
+            player.hide()
+            player.lives -= 1
+            player.shield = 100
+
+    hits = pygame.sprite.spritecollide(player, projectiles, True, pygame.sprite.collide_circle)
+    for hit in hits:
+        player.shield -= hit.radius * 2
         if player.shield <= 0:
             death_explosion = Explosion(player.rect.center, 'player')
             all_sprites.add(death_explosion)
@@ -401,6 +543,16 @@ while running:
     draw_hp_bar(screen, 5, 5, player.shield)
     draw_lives(screen, WIDTH - 100, 5, player.lives,
                player_mini_img)
+    horizontal_borders.draw(screen)
+    vertical_borders.draw(screen)
+    all_sprites.draw(screen)
+    all_sprites.update()
+    all_sprites_list.update()
+    projectiles.update()
+    enemy_sprites.update()
+    all_sprites_list.draw(screen)
+    projectiles.draw(screen)
+    enemy_sprites.draw(screen)
     pygame.display.flip()
 
 pygame.quit()
