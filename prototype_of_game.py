@@ -41,6 +41,7 @@ def draw_text(surf, text, size, x, y):
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
 
+
 def draw_hp_bar(surf, x, y, pct):
     if pct < 0:
         pct = 0
@@ -246,12 +247,14 @@ class Explosion(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 self.rect.center = center
 
+
 delay = []
 for i in range(1000, 1750):
     delay.append(i)
 point = []
 for i in range(10, 500):
     point.append(i)
+
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, radius, x, y, x_, y_, projectiles, enemy_images, delay, point):
@@ -266,14 +269,14 @@ class Enemy(pygame.sprite.Sprite):
         self.image_orig = random.choice(enemy_images)
         self.image_orig.set_colorkey(BLACK)
         self.image = self.image_orig.copy()
-       # self.rect = self.image.get_rect()
-      #  self.radius = int(self.rect.width * .85 / 2)
-      #  self.rect.x = random.randrange(width - self.rect.width)
-       # self.rect.y = random.randrange(-150, -100)
-    #    self.speedy = random.randrange(1, 8)
-      #  self.speedx = random.randrange(-3, 3)
-    #    self.rot = 0
-     #   self.rot_speed = random.randrange(-8, 8)
+        # self.rect = self.image.get_rect()
+        #  self.radius = int(self.rect.width * .85 / 2)
+        #  self.rect.x = random.randrange(width - self.rect.width)
+        # self.rect.y = random.randrange(-150, -100)
+        #    self.speedy = random.randrange(1, 8)
+        #  self.speedx = random.randrange(-3, 3)
+        #    self.rot = 0
+        #   self.rot_speed = random.randrange(-8, 8)
         self.last_update = pygame.time.get_ticks()
         self.rect = pygame.Rect(random.choice(point), random.choice(point), 2 * radius, 2 * radius)
         self.rect = self.image.get_rect()
@@ -285,7 +288,6 @@ class Enemy(pygame.sprite.Sprite):
         self.shoot_delay = random.choice(delay)
         self.speed = 1
         self.projectiles = projectiles
-
 
     def update(self):
         if self.rect.top > height + 10 or self.rect.left < -25 or self.rect.right > width + 20:
@@ -303,6 +305,7 @@ class Enemy(pygame.sprite.Sprite):
             vel = Vector2(self.speed, 31)
             self.projectiles.add(Projectile(self.rect.x, self.rect.y, vel, self.rect.centerx, self.rect.top))
 
+
 class Projectile(pygame.sprite.Sprite):
 
     def __init__(self, x, y, vel, centerx, top):
@@ -314,6 +317,7 @@ class Projectile(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.move_ip(self.vel)
+
 
 bullet_images = []
 bullet_list = ['laserBlue05.png', 'laserGreen05.png', 'laserRed01.png',
@@ -334,8 +338,6 @@ if score > 0:
     enemy = Enemy(20, 100, 100, 150, 150, projectiles, enemy_images, delay, point)
     enemy_sprites.add(enemy)
 
-
-
 horizontal_borders = pygame.sprite.Group()
 vertical_borders = pygame.sprite.Group()
 
@@ -355,23 +357,26 @@ class Border(pygame.sprite.Sprite):
 
 
 Border(5, 5, width - 5, 5)
-Border(5, height - 5, width - 5, height - 5)
+Border(5, height / 2, width - 5, height / 2)
 Border(5, 5, 5, height - 5)
 Border(width - 5, 5, width - 5, height - 5)
 if score > 0:
     for i in range(10):
         Enemy(20, 100, 100, 150, 150, projectiles, enemy_images, delay, point)
 
+
 def newmob():
     m = Mob()
     all_sprites.add(m)
     mobs.add(m)
+
 
 def newenemy():
     if score > 0:
         m = Enemy(20, 100, 100, 150, 150, projectiles, enemy_images, delay, point)
         all_sprites.add(m)
         mobs.add(m)
+
 
 text = open("plane.txt", encoding='utf8').read()
 player_img = pygame.image.load(path.join(img_dir, text)).convert()
@@ -406,7 +411,6 @@ powerup_images['shield'] = \
     pygame.image.load(path.join(img_dir, '3668853-ambulance-expense-healthcare-medicine_1080161.png')).convert()
 powerup_images['gun'] = pygame.image.load(path.join(img_dir, 'bolt_gold.png')).convert()
 
-
 shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'pew.wav'))
 shield_sound = pygame.mixer.Sound(path.join(snd_dir, 'Powerup4.wav'))
 power_sound = pygame.mixer.Sound(path.join(snd_dir, 'Powerup5.wav'))
@@ -436,13 +440,13 @@ while running:
             conn = sqlite3.connect('data/scores.db')
             cr = conn.cursor()
             similar = cr.execute("""SELECT * FROM results WHERE SCORE == ?""",
-                       (score, )).fetchall()
+                                 (score,)).fetchall()
             print(similar)
             if similar == []:
                 cr.execute("""DELETE from results where SCORE == ?""",
-                           (score, ))
+                           (score,))
             cr.execute("""INSERT INTO results(DATE_TIME,SCORE) VALUES(?,?)""",
-                        (data_time.strftime('%d-%m-%Y %H:%M:%S'), score))
+                       (data_time.strftime('%d-%m-%Y %H:%M:%S'), score))
             # SELECT SCORE FROM results
             #     WHERE SCORE > 0
             conn.commit()
