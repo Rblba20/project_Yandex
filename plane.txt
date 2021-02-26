@@ -1,1 +1,0 @@
-playerShip2_blue.png
